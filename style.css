@@ -115,17 +115,18 @@ body {
     box-shadow: 0 0 10px red;
 }
 
-.note-container.under,
-.note-container.under ~ .note-container {
- /*transform: translateY(-100px);*/
-}
 .note-container.under .note {
-    transform: translateY(50px);
-    box-shadow: 0 0 10px red;
+    transform: translateY(-50px);
 }
-.note-container.under ~ .note-container .note {
-    transform: translateY(50px);
-    box-shadow: 0 0 10px red;
+
+.note:hover:first-of-type + .note{
+    color: green;
+}
+/*.note-container.under ~ .note-container .note {*/
+/*    transform: translateY(50px);*/
+/*}*/
+.note-container.under + .note-container .note {
+    transform: translateY(5px);
 }
 
 .note.under {

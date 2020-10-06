@@ -7,6 +7,19 @@ document.querySelectorAll('.note').forEach(noteProcess);
 document.querySelectorAll('.column').forEach(columnProcess);
 document.querySelectorAll('.note-container').forEach(containerProcess);
 document.querySelectorAll('.set-container').forEach(setContainerProcess);
+let oldY = 0;
+let direction = '';
+
+document.addEventListener('mousemove', function (event) {
+    if (event.pageY < oldY){
+        direction = 'UP';
+
+    }else if (event.pageY > oldY){
+        direction = 'DOWN';
+    }
+    console.log(direction);
+    oldY = event.pageY;
+})
 
 function noteProcess(noteElement){
     noteElement.addEventListener('dragstart', dragStart);
@@ -25,7 +38,7 @@ function containerProcess(containerElement){
     containerElement.addEventListener('dragover', dragOverContainer, false);
     containerElement.addEventListener('dragenter', dragEnterContainer, false);
     containerElement.addEventListener('dragleave', dragLeaveContainer, false);
-    containerElement.addEventListener('drop', dropContainer, true);
+    containerElement.addEventListener('drop', dropContainer, false);
 }
 
 function columnProcess(columnElement){
