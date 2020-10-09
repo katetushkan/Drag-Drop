@@ -2,6 +2,8 @@ let draggedNote = '';
 let draggedColumn = '';
 let draggedContainer = '';
 let draggedCard = '';
+let animatedElem = Array();
+let draggedSet = '';
 
 document.querySelectorAll('.note').forEach(noteProcess);
 document.querySelectorAll('.column').forEach(columnProcess);
@@ -54,19 +56,30 @@ function columnProcess(columnElement){
             columnElement.querySelector('.notes').append(container);
         }
         else if (draggedColumn){
-            debugger
             const children = Array.from(document.querySelector('.columns').children);
-            const indexA = children.indexOf(this.parentElement);
-            const indexB = children.indexOf(draggedColumn.parentElement);
-            const container = document.createElement('div');
-            container.classList.add('set-container');
-            container.appendChild(draggedColumn);
-            if (indexA < indexB){
-                document.querySelector('.columns').insertBefore(container, this.parentElement);
-            } else {
-                document.querySelector('.columns').insertBefore(container, this.parentElement.nextElementSibling);
+            debugger;
+            const newContainer = document.createElement('div');
+            newContainer.classList.add('set-container');
+            let oldChild = this.children[0];
+
+
+            // const indexA = children.indexOf(this.parentElement);
+            // const indexB = children.indexOf(draggedColumn.parentElement);
+            // const container = document.createElement('div');
+            // container.classList.add('set-container');
+            // container.appendChild(draggedColumn);
+            // if (indexA < indexB){
+            //     document.querySelector('.columns').insertBefore(container, this.parentElement);
+            // } else {
+            //     document.querySelector('.columns').insertBefore(container, this.parentElement.nextElementSibling);
+            // }
+            // document.querySelectorAll('.column').forEach(column => column.classList.remove('under'));
+            if(animatedElem){
+                animatedElem.forEach((elem)=>{
+                    elem.style = 'transform: none';
+                });
+                animatedElem.length = 0;
             }
-            document.querySelectorAll('.column').forEach(column => column.classList.remove('under'));
         }
     }, false);
 
@@ -88,6 +101,7 @@ function setContainerProcess(setContainer){
     setContainer.addEventListener('dragover', dragOverSet, false);
     setContainer.addEventListener('dragenter', dragEnterSet, false);
     setContainer.addEventListener('dragleave', dragLeaveSet, false);
+    setContainer.addEventListener('drop', dropCol, false);
 
 }
 
@@ -107,17 +121,68 @@ function dragEnd(event){
     draggedCard = null;
     this.classList.remove('dragged');
     document.querySelectorAll('.note').forEach(el => el.classList.remove('under'));
+    if(animatedElem){
+        animatedElem.forEach((elem)=>{
+            elem.style = 'transform: none';
+        })
+        animatedElem.length = 0;
+    }
 
 
 }
 
 //container functions
-function dragEnterContainer(event){
+function dragEnterContainer(event) {
     event.preventDefault()
     if (this.querySelector('.dragged') === null) {
         this.classList.add('under');
     }
+
+    const cards = Array.from(this.parentElement.children);
+    const children = Array();
+    cards.forEach((elem) => {
+        children.push(elem.firstChild)
+    });
+
+        if (direction === 'UP') {
+            console.log('enter up');
+            let board = children.indexOf(this.children[0]);
+            for (let elem = children.length - 2; elem >= board; elem--) {
+                console.log(elem)
+                children[elem].style = 'transform: translateY(50px)';
+                animatedElem.push(children[elem]);
+            }
+            if (draggedCard !== this.parentElement.parentElement){
+                children[children.length-1].style ='transform: translateY(50px)';
+                animatedElem.push(children[children.length-1]);
+            }
+
+        }
+        if (direction === 'DOWN') {
+            let board = children.indexOf(this.children[0]);
+            for (let elem = 1; elem <= board; elem++) {
+                console.log(elem)
+                children[elem].style = 'transform: translateY(-50px)';
+                animatedElem.push(children[elem]);
+            }
+            if (draggedCard !== this.parentElement.parentElement){
+                if (this.parentElement.children.length === 1){
+                    debugger
+                    this.children[0].style = 'transform: translateY(50px)';
+                    animatedElem.push(this.children[0]);
+                }
+                else {
+                    children[0].style ='transform: translateY(-50px)';
+                    animatedElem.push(children[0]);
+                }
+
+            }
+
+        }
+
+
 }
+
 
 function dragOverContainer(event){
     event.preventDefault();
@@ -126,6 +191,13 @@ function dragOverContainer(event){
 function dragLeaveContainer(event) {
     event.preventDefault();
     this.classList.remove('under');
+    if(animatedElem){
+        animatedElem.forEach((elem)=>{
+            elem.style = 'transform: none';
+        })
+        animatedElem.length = 0;
+    }
+
 }
 
 function dropContainer(event){
@@ -140,9 +212,14 @@ function dropContainer(event){
         draggedContainer.removeChild(newChild);
         this.appendChild(draggedNote);
         this.classList.remove('under');
+        if(animatedElem){
+            animatedElem.forEach((elem)=>{
+                elem.style = 'transform: none';
+            })
+            animatedElem.length = 0;
+        }
     }
     else {
-        debugger
         const container = document.createElement('div');
         container.classList.add('note-container')
         container.appendChild(draggedNote);
@@ -150,6 +227,12 @@ function dropContainer(event){
         draggedContainer.remove();
         this.parentElement.insertBefore(container, this);
         this.classList.remove('under')
+        if(animatedElem){
+            animatedElem.forEach((elem)=>{
+                elem.style = 'transform: none';
+            });
+            animatedElem.length = 0;
+        }
     }
 
 }
@@ -161,6 +244,7 @@ function dragStartColumn(event){
         .querySelectorAll('.note-container')
         .forEach(noteElement => noteElement.setAttribute('disabled', 'true'));
     draggedColumn = this;
+    draggedSet = this.parentElement
     draggedColumn.classList.add('dragged');
 
 }
@@ -180,7 +264,37 @@ function dragEnterSet(event){
     if ( !draggedColumn || draggedColumn === this){
         return
     }
-    this.classList.add('under');
+    if (this.querySelector('.dragged') === null) {
+        this.classList.add('under');
+    }
+    // this.classList.add('under');
+
+    const sets = Array.from(this.parentElement.children);
+
+    let children = Array();
+    sets.forEach((elem) => {
+        children.push(elem.firstChild)
+    });
+
+    if (direction === 'UP') {
+        console.log('enter up');
+        let board = children.indexOf(this.children[0]);
+        for (let elem = children.length - 2; elem >= board; elem--) {
+            console.log(elem)
+            children[elem].style = 'transform: translateY(200px)';
+            animatedElem.push(children[elem]);
+        }
+
+    }
+    if (direction === 'DOWN') {
+        let board = children.indexOf(this.children[0]);
+        for (let elem = 1; elem <= board; elem++) {
+            console.log(elem)
+            children[elem].style = 'transform: translateY(-200px)';
+            animatedElem.push(children[elem]);
+        }
+
+    }
 }
 
 function dragOverSet(event){
@@ -195,5 +309,33 @@ function dragLeaveSet(event){
         return
     }
     this.classList.remove('under');
+    if(animatedElem){
+        animatedElem.forEach((elem)=>{
+            elem.style = 'transform: none';
+        })
+        animatedElem.length = 0;
+    }
+
+}
+
+function dropCol(event){
+    event.stopPropagation();
+    const oldChild = this.firstChild;  // то что отехало вниз
+    const newChild = draggedColumn; // to chto draggable
+
+    this.appendChild(newChild);
+
+
+    this.removeChild(oldChild);
+
+    draggedSet.appendChild(oldChild);
+    this.classList.remove('under');
+    if(animatedElem){
+        animatedElem.forEach((elem)=>{
+            elem.style = 'transform: none';
+        })
+        animatedElem.length = 0;
+    }
+
 }
 

@@ -13,14 +13,16 @@ const sets = { set1:{
                         4: 'Task 4',
                         5: 'Task 5',
                         6: 'Task 6',
-                        7: 'Task 7'
+
                     },
 
                 },
                 set3: {
                     name: 'Set 3',
                     tasks: {
+                        7: 'Task 7',
                         8: 'task 8',
+                        9: 'Task 9',
                     },
 
                 }
@@ -38,14 +40,10 @@ const initializeList = function (sets){
         set.draggable = true;
         set.setAttribute('data-column-id', index.toString());
 
-        const title = document.createElement('p');
-        title.classList.add('column-header');
-        title.innerText = item.name;
-
         const notes = document.createElement('div');
         notes.classList.add('notes');
 
-        set.appendChild(title);
+
         set.appendChild(notes);
         setContainer.appendChild(set)
         columns.appendChild(setContainer);
