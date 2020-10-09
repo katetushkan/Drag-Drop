@@ -112,7 +112,7 @@ body {
 }
 .note-container.under{
     opacity: 1;
-    box-shadow: 0 0 10px red;
+    box-shadow: 0 0 10px #c3cbcf;
 }
 
 /*.note-container.under .note {*/
