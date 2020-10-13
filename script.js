@@ -2,7 +2,8 @@ let draggedNote = '';
 let draggedColumn = '';
 let draggedContainer = '';
 let draggedCard = '';
-
+let direction = '';
+let oldY = 0;
 let animatedElem = Array();
 let draggedSet = '';
 
@@ -54,24 +55,6 @@ function columnProcess(columnElement){
             columnElement.querySelector('.notes').append(container);
         }
         else if (draggedColumn){
-            const children = Array.from(document.querySelector('.columns').children);
-            debugger;
-            const newContainer = document.createElement('div');
-            newContainer.classList.add('set-container');
-            let oldChild = this.children[0];
-
-
-            // const indexA = children.indexOf(this.parentElement);
-            // const indexB = children.indexOf(draggedColumn.parentElement);
-            // const container = document.createElement('div');
-            // container.classList.add('set-container');
-            // container.appendChild(draggedColumn);
-            // if (indexA < indexB){
-            //     document.querySelector('.columns').insertBefore(container, this.parentElement);
-            // } else {
-            //     document.querySelector('.columns').insertBefore(container, this.parentElement.nextElementSibling);
-            // }
-            // document.querySelectorAll('.column').forEach(column => column.classList.remove('under'));
             if(animatedElem){
                 animatedElem.forEach((elem)=>{
                     elem.style = 'transform: none';
@@ -130,13 +113,15 @@ function dragEnd(event){
 
 //container functions
 function dragEnterContainer(event) {
+    debugger
     event.preventDefault();
     if (this.querySelector('.dragged') === null) {
         this.classList.add('under');
     }
 
     const cards = Array.from(this.parentElement.children);
-    const children = cards.forEach((elem) => {
+    const children = Array()
+    cards.forEach((elem) => {
         children.push(elem.firstChild)
     });
 
@@ -309,8 +294,8 @@ function dragLeaveSet(event){
 
 function dropCol(event){
     event.stopPropagation();
-    const oldChild = this.firstChild;  // то что отехало вниз
-    const newChild = draggedColumn; // to chto draggable
+    const oldChild = this.firstChild;
+    const newChild = draggedColumn;
 
     this.appendChild(newChild);
     this.removeChild(oldChild);
