@@ -2,6 +2,7 @@ let draggedNote = '';
 let draggedColumn = '';
 let draggedContainer = '';
 let draggedCard = '';
+
 let animatedElem = Array();
 let draggedSet = '';
 
@@ -9,8 +10,6 @@ document.querySelectorAll('.note').forEach(noteProcess);
 document.querySelectorAll('.column').forEach(columnProcess);
 document.querySelectorAll('.note-container').forEach(containerProcess);
 document.querySelectorAll('.set-container').forEach(setContainerProcess);
-let oldY = 0;
-let direction = '';
 
 document.addEventListener('mousemove', function (event) {
     if (event.pageY < oldY){
@@ -19,21 +18,20 @@ document.addEventListener('mousemove', function (event) {
     }else if (event.pageY > oldY){
         direction = 'DOWN';
     }
-    console.log(direction);
     oldY = event.pageY;
-})
+});
 
 function noteProcess(noteElement){
     noteElement.addEventListener('dragstart', dragStart);
     noteElement.addEventListener('dragend', dragEnd);
     noteElement.addEventListener('dragleave', (event) => {
-        event.preventDefault()
-        event.stopPropagation()
-    }, false)
+        event.preventDefault();
+        event.stopPropagation();
+    }, false);
     noteElement.addEventListener('dragover', (event) => {
-        event.preventDefault()
-        event.stopPropagation()
-    }, false)
+        event.preventDefault();
+        event.stopPropagation();
+    }, false);
 }
 
 function containerProcess(containerElement){
@@ -50,7 +48,7 @@ function columnProcess(columnElement){
         console.log('dropped card');
         if (draggedNote){
             const container = document.createElement('div');
-            container.classList.add('note-container')
+            container.classList.add('note-container');
             container.appendChild(draggedNote);
             containerProcess(container);
             columnElement.querySelector('.notes').append(container);
@@ -86,12 +84,12 @@ function columnProcess(columnElement){
     columnElement.addEventListener('dragstart', dragStartColumn);
     columnElement.addEventListener('dragend', dragEndColumn);
     columnElement.addEventListener('dragleave', (event) => {
-        event.preventDefault()
-        event.stopPropagation()
-    }, false)
+        event.preventDefault();
+        event.stopPropagation();
+    }, false);
     columnElement.addEventListener('dragover', (event) => {
-        event.preventDefault()
-        event.stopPropagation()
+        event.preventDefault();
+        event.stopPropagation();
     }, false)
 
 
@@ -124,63 +122,59 @@ function dragEnd(event){
     if(animatedElem){
         animatedElem.forEach((elem)=>{
             elem.style = 'transform: none';
-        })
+        });
         animatedElem.length = 0;
     }
-
 
 }
 
 //container functions
 function dragEnterContainer(event) {
-    event.preventDefault()
+    event.preventDefault();
     if (this.querySelector('.dragged') === null) {
         this.classList.add('under');
     }
 
     const cards = Array.from(this.parentElement.children);
-    const children = Array();
-    cards.forEach((elem) => {
+    const children = cards.forEach((elem) => {
         children.push(elem.firstChild)
     });
 
-        if (direction === 'UP') {
-            console.log('enter up');
-            let board = children.indexOf(this.children[0]);
-            for (let elem = children.length - 2; elem >= board; elem--) {
-                console.log(elem)
-                children[elem].style = 'transform: translateY(50px)';
-                animatedElem.push(children[elem]);
-            }
-            if (draggedCard !== this.parentElement.parentElement){
-                children[children.length-1].style ='transform: translateY(50px)';
-                animatedElem.push(children[children.length-1]);
-            }
-
+    if (direction === 'UP') {
+        console.log('enter up');
+        let board = children.indexOf(this.children[0]);
+        for (let elem = children.length - 2; elem >= board; elem--) {
+            console.log(elem);
+            children[elem].style = 'transform: translateY(50px)';
+            animatedElem.push(children[elem]);
         }
-        if (direction === 'DOWN') {
-            let board = children.indexOf(this.children[0]);
-            for (let elem = 1; elem <= board; elem++) {
-                console.log(elem)
-                children[elem].style = 'transform: translateY(-50px)';
-                animatedElem.push(children[elem]);
-            }
-            if (draggedCard !== this.parentElement.parentElement){
-                if (this.parentElement.children.length === 1){
-                    debugger
-                    this.children[0].style = 'transform: translateY(50px)';
-                    animatedElem.push(this.children[0]);
-                }
-                else {
-                    children[0].style ='transform: translateY(-50px)';
-                    animatedElem.push(children[0]);
-                }
+        if (draggedCard !== this.parentElement.parentElement){
+            children[children.length-1].style ='transform: translateY(50px)';
+            animatedElem.push(children[children.length-1]);
+        }
 
+    }
+    if (direction === 'DOWN') {
+        let board = children.indexOf(this.children[0]);
+        for (let elem = 1; elem <= board; elem++) {
+            console.log(elem);
+            children[elem].style = 'transform: translateY(-50px)';
+            animatedElem.push(children[elem]);
+        }
+        if (draggedCard !== this.parentElement.parentElement){
+            if (this.parentElement.children.length === 1){
+                debugger
+                this.children[0].style = 'transform: translateY(50px)';
+                animatedElem.push(this.children[0]);
+            }
+            else {
+                children[0].style ='transform: translateY(-50px)';
+                animatedElem.push(children[0]);
             }
 
         }
 
-
+    }
 }
 
 
@@ -194,16 +188,14 @@ function dragLeaveContainer(event) {
     if(animatedElem){
         animatedElem.forEach((elem)=>{
             elem.style = 'transform: none';
-        })
+        });
         animatedElem.length = 0;
     }
-
 }
 
 function dropContainer(event){
     event.stopPropagation();
     event.preventDefault();
-    console.log(this.parentElement.parentElement)
     if (this.parentElement.parentElement === draggedCard){
         console.log('draggedCard');
         const oldChild = this.firstChild;
@@ -215,18 +207,21 @@ function dropContainer(event){
         if(animatedElem){
             animatedElem.forEach((elem)=>{
                 elem.style = 'transform: none';
-            })
+            });
             animatedElem.length = 0;
         }
     }
     else {
         const container = document.createElement('div');
-        container.classList.add('note-container')
+        container.classList.add('note-container');
         container.appendChild(draggedNote);
         containerProcess(container);
+        if (draggedContainer.parentNode.children.length === 1) {
+            draggedContainer.parentNode.parentNode.remove();
+        }
         draggedContainer.remove();
         this.parentElement.insertBefore(container, this);
-        this.classList.remove('under')
+        this.classList.remove('under');
         if(animatedElem){
             animatedElem.forEach((elem)=>{
                 elem.style = 'transform: none';
@@ -234,19 +229,16 @@ function dropContainer(event){
             animatedElem.length = 0;
         }
     }
-
 }
 
 // column functions
 function dragStartColumn(event){
-
     document
         .querySelectorAll('.note-container')
         .forEach(noteElement => noteElement.setAttribute('disabled', 'true'));
     draggedColumn = this;
-    draggedSet = this.parentElement
+    draggedSet = this.parentElement;
     draggedColumn.classList.add('dragged');
-
 }
 
 function dragEndColumn(event){
@@ -280,27 +272,24 @@ function dragEnterSet(event){
         console.log('enter up');
         let board = children.indexOf(this.children[0]);
         for (let elem = children.length - 2; elem >= board; elem--) {
-            console.log(elem)
+            console.log(elem);
             children[elem].style = 'transform: translateY(200px)';
             animatedElem.push(children[elem]);
         }
-
     }
+
     if (direction === 'DOWN') {
         let board = children.indexOf(this.children[0]);
         for (let elem = 1; elem <= board; elem++) {
-            console.log(elem)
+            console.log(elem);
             children[elem].style = 'transform: translateY(-200px)';
             animatedElem.push(children[elem]);
         }
-
     }
 }
 
 function dragOverSet(event){
-
     event.preventDefault();
-
 }
 
 function dragLeaveSet(event){
@@ -312,7 +301,7 @@ function dragLeaveSet(event){
     if(animatedElem){
         animatedElem.forEach((elem)=>{
             elem.style = 'transform: none';
-        })
+        });
         animatedElem.length = 0;
     }
 
@@ -324,8 +313,6 @@ function dropCol(event){
     const newChild = draggedColumn; // to chto draggable
 
     this.appendChild(newChild);
-
-
     this.removeChild(oldChild);
 
     draggedSet.appendChild(oldChild);
@@ -333,9 +320,8 @@ function dropCol(event){
     if(animatedElem){
         animatedElem.forEach((elem)=>{
             elem.style = 'transform: none';
-        })
+        });
         animatedElem.length = 0;
     }
-
 }
 
