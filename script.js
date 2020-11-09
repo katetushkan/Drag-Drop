@@ -19,6 +19,7 @@ document.addEventListener('mousemove', function (event) {
     if (event.pageY < oldY){
         direction = 'UP';
 
+
     }else if (event.pageY > oldY){
         direction = 'DOWN';
     }
@@ -43,12 +44,19 @@ function columnsPr(columns){
             const set = document.createElement('div');
             set.classList.add('column');
             set.draggable = true;
+
+            const title = document.createElement('p');
+            title.classList.add('column-header');
+            title.innerText = 'Set ';
+
             const notes = document.createElement('div');
             notes.classList.add('notes');
             const noteContainer = document.createElement('div');
-            noteContainer.classList.add('note-container')
+            noteContainer.classList.add('note-container');
+
             noteContainer.appendChild(draggedNote);
             notes.appendChild(noteContainer);
+            set.appendChild(title);
             set.appendChild(notes);
             setContainer.appendChild(set);
 
@@ -56,16 +64,31 @@ function columnsPr(columns){
             setContainerProcess(setContainer);
             columnProcess(set);
 
-            let columns = document.querySelector('.columns');
-            if (direction === 'UP') {
-                console.log(event.target.nextSibling);
-                columns.insertBefore(setContainer, event.target.nextSibling);
-            }
-            if (direction === 'DOWN') {
-                columns.insertBefore(setContainer, event.target);
-            }
+            let columnsLayout = document.querySelector('.columns');
+            let columns = Array.from(document.querySelectorAll('.column'));
+            let center =  Array();
+            columns.forEach((column) =>{
+                // let center_i = column.getBoundingClientRect().bottom - column.getBoundingClientRect().height/2 ;
+                let top_i = column.getBoundingClientRect().top ;
+                center.push(top_i);
+            });
+            let point = 0;
+            let temp = 10000000;
+            debugger;
+
+            center.forEach((elem, index) =>{
+                if (Math.abs(elem - event.clientY) < temp){
+                    temp = Math.abs(elem - event.clientY);
+                    point = columns[index];
+
+                }
+
+            });
+            columnsLayout.insertBefore(setContainer, point.parentElement);
+
             draggedContainer.remove();
 
+            reArrangeSet();
 
         }
 
@@ -258,6 +281,7 @@ function dropContainer(event){
         containerProcess(container);
         if (draggedContainer.parentNode.children.length === 1) {
             draggedContainer.parentNode.parentNode.parentNode.remove();
+            reArrangeSet();
         }
         draggedContainer.remove();
         this.parentElement.insertBefore(container, this);
@@ -364,6 +388,9 @@ function dropCol(event){
 
     draggedSet.appendChild(oldChild);
     this.classList.remove('under');
+
+    reArrangeSet();
+
     if(animatedElem){
         animatedElem.forEach((elem)=>{
             elem.style = 'transform: none';
@@ -372,3 +399,9 @@ function dropCol(event){
     }
 }
 
+function reArrangeSet(){
+    let containers = document.querySelectorAll('.column');
+    containers.forEach((container, index) => {
+        container.firstChild.innerText = 'Set ' + (index + 1).toString();
+    });
+}

@@ -36,12 +36,18 @@ const initializeList = function (sets){
         set.draggable = true;
         set.setAttribute('data-column-id', index.toString());
 
+        const title = document.createElement('p');
+        title.classList.add('column-header');
+        title.innerText = item.name;
+
         const notes = document.createElement('div');
         notes.classList.add('notes');
 
+        set.appendChild(title);
         set.appendChild(notes);
         setContainer.appendChild(set);
         columns.appendChild(setContainer);
+
         let array_notes = Object.values(array_set[index].tasks);
         if (array_notes.length !== 0){
             array_notes.forEach((task, i) => {
