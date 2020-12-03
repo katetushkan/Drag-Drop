@@ -114,21 +114,32 @@ body {
 .column.under {
 	margin-top: 20px;
 }
+.note-container{
+    height: 50px;
+    padding-top: 10px;
+}
 .note-container.under{
     opacity: 1;
-    box-shadow: 0 0 10px #c3cbcf;
+    /*box-shadow: 0 0 10px #c3cbcf;*/
+}
+.note-container.leave{
+    height: 0px;
+    padding-top: 0px;
+    /*box-shadow: 0 0 10px #c3cbcf;*/
 }
 
-/*.note-container.under .note {*/
-/*    transform: translateY(-50px);*/
-/*}*/
-
-/*.note-container.under ~ .note-container .note {*/
-/*    transform: translateY(50px);*/
-/*}*/
-.note-container.under + .note-container .note {
-    transform: translateY(5px);
+.note-container.under .note {
+    transform: translateY(50px);
+    /*margin: 0rem 0 0.4rem 0;*/
 }
+
+.note-container.under ~ .note-container .note {
+    transform: translateY(50px);
+    /*margin: 0.4rem 0;*/
+}
+/*.note-container.under + .note-container .note {*/
+/*    transform: translateY(5px);*/
+/*}*/
 .set-container.under + .set-container .column{
     transform: translateY(5px);
 }

@@ -29,10 +29,10 @@ document.addEventListener('mousemove', function (event) {
 function columnsPr(columns){
     columns.addEventListener('drop', (event)=>{
         if (event.target.className === "note-container under"){
-            return
+            return true
         }
         else if (event.target.className === "set-container under"){
-            return
+            return true
         }
         else {
             event.stopPropagation();
@@ -74,7 +74,6 @@ function columnsPr(columns){
             });
             let point = 0;
             let temp = 10000000;
-            debugger;
 
             center.forEach((elem, index) =>{
                 if (Math.abs(elem - event.clientY) < temp){
@@ -86,9 +85,13 @@ function columnsPr(columns){
             });
             columnsLayout.insertBefore(setContainer, point.parentElement);
 
-            draggedContainer.remove();
 
+            if (draggedContainer.parentNode.children.length === 1) {
+                draggedContainer.parentNode.parentNode.parentNode.remove();
+            }
+            draggedContainer.remove();
             reArrangeSet();
+
 
         }
 
@@ -107,8 +110,8 @@ function noteProcess(noteElement){
         event.preventDefault();
         event.stopPropagation();
     }, false);
-}
 
+}
 
 function containerProcess(containerElement){
     containerElement.addEventListener('dragover', dragOverContainer, false);
@@ -166,14 +169,17 @@ function dragStart(event){
     draggedNote = this;
     draggedContainer = this.parentElement;
     draggedCard = this.parentElement.parentElement.parentElement;
+    this.parentElement.classList.add('leave');
     this.classList.add('dragged');
 }
 
 function dragEnd(event){
     event.stopPropagation();
     draggedNote = null;
+    draggedContainer.classList.remove('leave');
     draggedContainer = null;
     draggedCard = null;
+
     this.classList.remove('dragged');
     document.querySelectorAll('.note').forEach(el => el.classList.remove('under'));
     if(animatedElem){
@@ -185,54 +191,64 @@ function dragEnd(event){
 
 }
 
+
 //container functions
 function dragEnterContainer(event) {
     if (!draggedNote){
-        return
+        return true
     }
     else {
+
         event.preventDefault();
         if (this.querySelector('.dragged') === null) {
             this.classList.add('under');
         }
+        // let cardContainers = Array.from(this.parentElement.children);
+        //
+        // let cardsContainerBorders =  Array();
+        // cardContainers.forEach((container) =>{
+        //     let top_i = { top: container.children[0].getBoundingClientRect().top,
+        //         bottom: container.children[0].getBoundingClientRect().bottom  } ;
+        //     cardsContainerBorders.push(top_i);
+        // });
 
-        const cards = Array.from(this.parentElement.children);
-        const children = Array()
-        cards.forEach((elem) => {
-            children.push(elem.firstChild)
-        });
+        //
+        // cardContainers.forEach((container, index) => {
+        //     if (container === this){
+                // if (Math.abs(event.clientY - cardsContainerBorders[index].top) < Math.abs(cardsContainerBorders[index].bottom - event.clientY)){
+                //
+                //
+                //
+                // }
+                // else if (this === cardContainers[cardContainers.length-1]){
+                //     for (let bottomBorder = index; bottomBorder >= 0; bottomBorder--){
+                //         cardContainers[bottomBorder].children[0].style = 'transform: translateY(-50px)';
+                //         animatedElem.push(cardContainers[bottomBorder].children[0]);
+                //     }
+                // }
+                // if (this === cardContainers[cardContainers.length-1]){
+                //     debugger;
+                //     if (Math.abs(event.clientY - cardsContainerBorders[index].top) < Math.abs(cardsContainerBorders[index].bottom - event.clientY)){
+                //             for (let bottomBorder = index; bottomBorder >= 0; bottomBorder--){
+                //                 cardContainers[bottomBorder].children[0].style = 'transform: translateY(-50px)';
+                //                 animatedElem.push(cardContainers[bottomBorder].children[0]);
+                //             }
+                //         }
+                //
+                //     }
+                // else {
+                //     for (let upBorder = index; upBorder <= cardContainers.length - 1; upBorder++){
+                //         console.log(cardsContainerBorders)
+                //         cardContainers[upBorder].children[0].style = 'transform: translateY(50px)';
+                //         animatedElem.push(cardContainers[upBorder].children[0]);
+                //     }
+                //
+                // }
 
-        if (direction === 'UP') {
-            let board = children.indexOf(this.children[0]);
-            for (let elem = children.length - 2; elem >= board; elem--) {
-                children[elem].style = 'transform: translateY(50px)';
-                animatedElem.push(children[elem]);
-            }
-            if (draggedCard !== this.parentElement.parentElement){
-                children[children.length-1].style ='transform: translateY(50px)';
-                animatedElem.push(children[children.length-1]);
-            }
 
-        }
-        if (direction === 'DOWN') {
-            let board = children.indexOf(this.children[0]);
-            for (let elem = 1; elem <= board; elem++) {
-                children[elem].style = 'transform: translateY(-50px)';
-                animatedElem.push(children[elem]);
-            }
-            if (draggedCard !== this.parentElement.parentElement){
-                if (this.parentElement.children.length === 1){
-                    this.children[0].style = 'transform: translateY(50px)';
-                    animatedElem.push(this.children[0]);
-                }
-                else {
-                    children[0].style ='transform: translateY(-50px)';
-                    animatedElem.push(children[0]);
-                }
+        //     }
+        // });
 
-            }
-
-        }
     }
 
 
@@ -249,6 +265,8 @@ function dragOverContainer(event){
 function dragLeaveContainer(event) {
     event.preventDefault();
     this.classList.remove('under');
+    // document.querySelectorAll('.note-container').forEach(el => el.classList.remove('leave'));
+    console.log('leave');
     if(animatedElem){
         animatedElem.forEach((elem)=>{
             elem.style = 'transform: none';
@@ -260,12 +278,15 @@ function dragLeaveContainer(event) {
 function dropContainer(event){
     event.stopPropagation();
     event.preventDefault();
+    document.querySelectorAll('.note-container').forEach(el => el.classList.remove('leave'));
     if (this.parentElement.parentElement === draggedCard){
-        const oldChild = this.firstChild;
-        const newChild = draggedNote;
-        draggedContainer.appendChild(oldChild);
-        draggedContainer.removeChild(newChild);
-        this.appendChild(draggedNote);
+        const layout = this.parentElement;
+        let newContainer = document.createElement('div');
+        newContainer.classList.add('note-container');
+        newContainer.appendChild(draggedNote);
+        layout.insertBefore(newContainer, this);
+        containerProcess(newContainer);
+        draggedContainer.remove();
         this.classList.remove('under');
         if(animatedElem){
             animatedElem.forEach((elem)=>{
@@ -301,7 +322,7 @@ function dropContainer(event){
 }
 
 // column functions
-function dragStartColumn(event){
+function dragStartColumn(){
     document
         .querySelectorAll('.note-container')
         .forEach(noteElement => noteElement.setAttribute('disabled', 'true'));
@@ -310,7 +331,7 @@ function dragStartColumn(event){
     draggedColumn.classList.add('dragged');
 }
 
-function dragEndColumn(event){
+function dragEndColumn(){
     draggedColumn.classList.remove('dragged');
     draggedColumn = null;
 
@@ -338,7 +359,6 @@ function dragEnterSet(event){
     sets.forEach((elem) => {
         children.push(elem.firstChild)
     });
-
     if (direction === 'UP') {
         let board = children.indexOf(this.children[0]);
         for (let elem = children.length - 2; elem >= board; elem--) {
@@ -381,9 +401,8 @@ function dragLeaveSet(event){
 function dropCol(event){
     event.stopPropagation();
     const oldChild = this.firstChild;
-    const newChild = draggedColumn;
 
-    this.appendChild(newChild);
+    this.appendChild(draggedColumn);
     this.removeChild(oldChild);
 
     draggedSet.appendChild(oldChild);
